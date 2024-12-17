@@ -9,7 +9,7 @@ const Guestbook = () => {
   const [showModal, setShowModal] = useState(false);
 
 //endpoint URL
-const URL = "http://localhost:3000/guests"
+const URL = "https://66e37e3f494df9a478e54f66.mockapi.io/guests"
 
  // UseEffect runs function to get Guests for state to hold and display from the db.json file using json-server
  useEffect(() => {
@@ -39,21 +39,41 @@ const URL = "http://localhost:3000/guests"
     setNewName('');
   };
 
- const postGuest = async (user) => {
-   const response = await fetch(URL, {
-     method: 'POST',
-     headers: { 'Content-Type': 'application/json' },
-     body: JSON.stringify(user),
-   })
-   getGuests()
-  }
+  const postGuest = async (user) => {
+    try {
+      const response = await fetch(URL, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(user),
+      });
+      getGuests();
+    } catch (error) {
+      console.error('Error posting guest:', error);
+    }
+  };
+  
 
   // Update
   const handleEditGuest = () => {
-    const updatedGuests = [...guests];
-    updatedGuests[editIndex] = editName;
-    setGuests(updatedGuests);
+    console.log(editName,editIndex )
+    //const updatedGuests = [...guests];
+    //updatedGuests[editIndex] = editName;
+    //setGuests(updatedGuests);
+    putGuest(editName,editIndex)
     setShowModal(false);
+  };
+
+  const putGuest = async (name, index) => {
+    try {
+      const response = await fetch(URL + '/' + index, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ guest: name }),
+      });
+      getGuests();
+    } catch (error) {
+      console.error('Error updating guest:', error);
+    }
   };
 
   // Delete
@@ -71,7 +91,9 @@ const URL = "http://localhost:3000/guests"
 
   // Open Modal for Edit
   const openEditModal = (index) => {
-    setEditName(guests[index]);
+    // When opening the modal we need the right index for the setEditName to work right. 
+    console.log(index);
+    setEditName(guests[index].guest);
     setEditIndex(index);
     setShowModal(true);
   };
