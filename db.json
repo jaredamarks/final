@@ -1,0 +1,16 @@
+{
+  "guests": [
+    {
+      "id": 1,
+      "guest": "Jared"
+    },
+    {
+      "id": 3,
+      "guest": "Alice"
+    },
+    {
+      "guest": "bob",
+      "id": 4
+    }
+  ]
+}

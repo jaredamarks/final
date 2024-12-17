@@ -8,23 +8,45 @@ const Guestbook = () => {
   const [editIndex, setEditIndex] = useState(null);
   const [showModal, setShowModal] = useState(false);
 
- // Load data from localStorage on component mount
+//endpoint URL
+const URL = "http://localhost:3000/guests"
+
+ // UseEffect runs function to get Guests for state to hold and display from the db.json file using json-server
  useEffect(() => {
-    const savedGuests = JSON.parse(localStorage.getItem('guests')) || [];
-    setGuests(savedGuests);
+  console.log("useEffects ran")
+    getGuests()
   }, []);
 
-  // Save data to localStorage whenever the `guests` state changes
-  useEffect(() => {
-    localStorage.setItem('guests', JSON.stringify(guests));
-  }, [guests]);
+
+  async function getGuests(){
+    try {
+      const response = await fetch(URL);
+      const data = await response.json();
+      console.log("response from server: ", data);
+      setGuests(data);
+    } catch (error) {
+      console.error('Error fetching guests:', error);
+    }
+  }
 
   // Create
   const handleAddGuest = () => {
-    if (newName.trim() === '') return;
-    setGuests([...guests, newName]);
+   
+   console.log(newName);
+    const user = { guest: newName };
+    postGuest(user);
+    //setGuests([...guests, user]);
     setNewName('');
   };
+
+ const postGuest = async (user) => {
+   const response = await fetch(URL, {
+     method: 'POST',
+     headers: { 'Content-Type': 'application/json' },
+     body: JSON.stringify(user),
+   })
+   getGuests()
+  }
 
   // Update
   const handleEditGuest = () => {
@@ -35,8 +57,16 @@ const Guestbook = () => {
   };
 
   // Delete
-  const handleDeleteGuest = (index) => {
-    setGuests(guests.filter((_, i) => i !== index));
+  const handleDeleteGuest = async (index) => {
+    const response = await fetch(URL + '/' + index, 
+      {
+        method: 'DELETE',
+        headers: { 'Content-Type': 'application/json' },
+      })
+      
+    
+    //setGuests(guests.filter((_, i) => i !== index));
+    getGuests();
   };
 
   // Open Modal for Edit
@@ -70,15 +100,15 @@ const Guestbook = () => {
           </tr>
         </thead>
         <tbody>
-          {guests.map((guest, index) => (
-            <tr key={index}>
-              <td>{index + 1}</td>
-              <td>{guest}</td>
+          {guests && guests.map((guest) => (
+            <tr key={guest.id}>
+              <td>{guest.id}</td>
+              <td>{guest.guest}</td>
               <td>
                 <Button
                   variant="warning"
                   size="sm"
-                  onClick={() => openEditModal(index)}
+                  onClick={() => openEditModal(guest.id)}
                   className="me-2"
                 >
                   Edit
@@ -86,7 +116,7 @@ const Guestbook = () => {
                 <Button
                   variant="danger"
                   size="sm"
-                  onClick={() => handleDeleteGuest(index)}
+                  onClick={() => handleDeleteGuest(guest.id)}
                 >
                   Delete
                 </Button>
