@@ -90,25 +90,32 @@ const URL = "https://66e37e3f494df9a478e54f66.mockapi.io/guests"
   };
 
   // Open Modal for Edit
-  const openEditModal = (index) => {
+  const openEditModal = (guest) => {
     // When opening the modal we need the right index for the setEditName to work right. 
-    console.log(index);
-    setEditName(guests[index].guest);
-    setEditIndex(index);
+    console.log(guest);
+    setEditName(guests.guest);
+    setEditIndex(guest.id);
     setShowModal(true);
+  };
+
+  const handleSubmit = (e) => {
+    e.preventDefault();
+    if (newName.trim()) {
+      handleAddGuest();
+    }
   };
 
   return (
     <div className="container mt-4">
       <h2>GuestBook</h2>
-      <Form className="d-flex mb-3">
+      <Form onSubmit={handleSubmit}  className="d-flex mb-3" >
         <Form.Control
           type="text"
           placeholder="Enter your name"
           value={newName}
           onChange={(e) => setNewName(e.target.value)}
         />
-        <Button variant="primary" onClick={handleAddGuest} className="ms-2">
+        <Button type='submit' variant="primary" onClick={handleAddGuest} className="ms-2">
           Add
         </Button>
       </Form>
@@ -130,7 +137,7 @@ const URL = "https://66e37e3f494df9a478e54f66.mockapi.io/guests"
                 <Button
                   variant="warning"
                   size="sm"
-                  onClick={() => openEditModal(guest.id)}
+                  onClick={() => openEditModal(guest)}
                   className="me-2"
                 >
                   Edit
@@ -138,7 +145,7 @@ const URL = "https://66e37e3f494df9a478e54f66.mockapi.io/guests"
                 <Button
                   variant="danger"
                   size="sm"
-                  onClick={() => handleDeleteGuest(guest.id)}
+                  onClick={() => handleDeleteGuest(guest)}
                 >
                   Delete
                 </Button>
